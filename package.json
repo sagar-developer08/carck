@@ -2,20 +2,11 @@
   "name": "my-json-editor",
   "private": true,
   "version": "1.0.0",
-  "author": {
-    "name": "Your Name",
-    "email": "your.email@example.com"
-  },
-  "license": "MIT",
   "description": "A powerful JSON visualization and editing tool",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "next-sitemap --config next-sitemap.config.js",
-    "start": "next start",
-    "lint": "tsc --project tsconfig.json && eslint src && prettier --check src",
-    "lint:fix": "eslint --fix src & prettier --write src",
-    "analyze": "ANALYZE=true npm run build"
+    "start": "next start"
   },
   "dependencies": {
     "@mantine/code-highlight": "^7.17.7",

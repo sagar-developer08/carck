@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useMantineColorScheme } from "@mantine/core";
@@ -17,8 +17,12 @@ import useGraph from "../features/editor/views/GraphView/stores/useGraph";
 import useConfig from "../store/useConfig";
 import useFile from "../store/useFile";
 
-const ModalController = dynamic(() => import("../features/modals/ModalController"));
-const ExternalMode = dynamic(() => import("../features/editor/ExternalMode"));
+const ModalController = dynamic(() => import("../features/modals/ModalController"), {
+  ssr: false,
+});
+const ExternalMode = dynamic(() => import("../features/editor/ExternalMode"), {
+  ssr: false,
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,10 +61,12 @@ export const StyledEditor = styled(Allotment)`
 
 const TextEditor = dynamic(() => import("../features/editor/TextEditor"), {
   ssr: false,
+  loading: () => <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>Loading Editor...</div>
 });
 
 const LiveEditor = dynamic(() => import("../features/editor/LiveEditor"), {
   ssr: false,
+  loading: () => <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>Loading Graph...</div>
 });
 
 const HomePage = () => {
@@ -68,15 +74,39 @@ const HomePage = () => {
   const { setColorScheme } = useMantineColorScheme();
   const checkEditorSession = useFile(state => state.checkEditorSession);
   const fullscreen = useGraph(state => state.fullscreen);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (isReady) checkEditorSession(query?.json);
-  }, [checkEditorSession, isReady, query]);
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
-    // Force light mode
-    setColorScheme("light");
-  }, [setColorScheme]);
+    if (isReady && isClient) {
+      checkEditorSession(query?.json);
+    }
+  }, [checkEditorSession, isReady, query, isClient]);
+
+  useEffect(() => {
+    if (isClient) {
+      // Force light mode only on client
+      setColorScheme("light");
+    }
+  }, [setColorScheme, isClient]);
+
+  // Don't render until client-side hydration is complete
+  if (!isClient) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '16px' 
+      }}>
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <>
@@ -94,7 +124,7 @@ const HomePage = () => {
             <StyledPageWrapper>
               <Toolbar />
               <StyledEditorWrapper>
-                <StyledEditor proportionalLayout={false}>
+                <StyledEditor proportionalLayout={false} key={`editor-${isClient}`}>
                   <Allotment.Pane
                     preferredSize={450}
                     minSize={fullscreen ? 0 : 300}

@@ -63,7 +63,7 @@ const StyledBottomBarItem = styled.button<{ $bg?: string }>`
   font-size: 12px;
   font-weight: 400;
   color: ${({ theme }) => theme.INTERACTIVE_NORMAL};
-  background: ${({ $bg }) => $bg};
+  background: ${({ $bg }) => $bg || 'transparent'};
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -100,7 +100,29 @@ export const BottomBar = () => {
 
   return (
     <StyledBottomBar>
-     
+      <StyledLeft>
+        <StyledBottomBarItem>
+          <VscRunAll size="12" />
+          <Text>{nodeCount} nodes</Text>
+        </StyledBottomBarItem>
+        {error && (
+          <Popover width={200} position="top" withArrow>
+            <Popover.Target>
+              <StyledBottomBarItem $bg="rgba(255, 0, 0, 0.1)">
+                <VscError size="12" color="#ff4444" />
+                <Text>Error</Text>
+              </StyledBottomBarItem>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Text size="xs">{error}</Text>
+            </Popover.Dropdown>
+          </Popover>
+        )}
+      </StyledLeft>
+      
+      <StyledRight>
+        {/* Buttons hidden as requested */}
+      </StyledRight>
     </StyledBottomBar>
   );
 };

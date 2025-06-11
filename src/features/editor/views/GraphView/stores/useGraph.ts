@@ -30,7 +30,7 @@ const initialStates: Graph = {
   direction: "RIGHT",
   loading: true,
   graphCollapsed: false,
-  fullscreen: false,
+  fullscreen: true,
   collapseAll: false,
   nodes: [],
   edges: [],
